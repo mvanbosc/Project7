@@ -106,7 +106,7 @@ public class Server implements MessageListener {
                                     else if(distance == curDist)
                                     {
                                             if(i+1 == volLoc.size()){
-                                                    volLoc
+                                                   // volLoc
                                             }
                                     }
                             }
