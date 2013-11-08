@@ -19,6 +19,7 @@ public class Server implements MessageListener {
     private String bldg = ""; //VOLUNTEER BUILDING IN MESSAGE
     int distance = 20000000; // distance between the 2 locations
     int[][] bldgArray; //ARRAY WITH BLDG DISTANCES
+    private int curDist;
     /**
      * Constructor.
      */
@@ -62,7 +63,6 @@ public class Server implements MessageListener {
              * 
              */
             public void FCFS(String message,int clientID) {
-
             if (message.substring(0, 7).equals("REQUEST")) {
 
                 if (volunteer.size() == 0) { // if there is no volunteers, add to queue
@@ -96,19 +96,41 @@ public class Server implements MessageListener {
     }
             public void Closest(String message, int clientID) {
                     if(message.substring(0, 9).equals("VOLUNTEER")){
-                            bldg = message.substring(10,message.length());
-                            volLoc.add(bldg);
+                            bldg = message.substring(10,message.length()); //bldg = the building abbreviation from the message
+                            algorithm = "CLOSEST"; //set urgency to closest
+                            volLoc.add(bldg); //add the building to the volunteer location
+                            volID.add(clientID); //add the id to the id linkedlist
+                            
                             for(int i=0;i<volLoc.size();i++){
-                                    int curDist = getDistance(volLoc.get(i), recLoc.get(0));
-                                    if(distance > curDist ){
-                                    distance = curDist;
+                                    curDist = getDistance(volLoc.get(i), recLoc.get(0)); //distance from req to volunteer
+                                    if(distance > curDist ){ 
+                                    distance = curDist;               //figure out which vol has the shortest distance
                                     }
-                                    else if(distance == curDist)
+                                    else if(distance == curDist)      //if same distance use the older one, i (curDist) is the older one so we dont need a condition
                                     {
-                                            if(i+1 == volLoc.size()){
-                                                   // volLoc
+                                            if(i+1 == volLoc.size()){ //if there are no more to try send the message
+                                            	try {
+                                                    channel.sendMessage("LOCATION " + bldg + algorithm , clientID);
+                                                    channel.sendMessage("VOLUNTEER " + clientID + curDist, recID.removeFirst());
+                                                } catch (NumberFormatException e) {
+                                                    // TODO Auto-generated catch block
+                                                    e.printStackTrace();
+                                                } catch (ChannelException e) {
+                                                    // TODO Auto-generated catch block
+                                                    e.printStackTrace();
+                                                }
                                             }
                                     }
+                            }
+                        	try {
+                                channel.sendMessage("LOCATION " + bldg + algorithm , clientID);
+                                channel.sendMessage("VOLUNTEER " + clientID + curDist, recID.removeFirst());
+                            } catch (NumberFormatException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            } catch (ChannelException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
                             }
                     }
             }
