@@ -1,7 +1,6 @@
 import java.util.*;
 //penis
 import edu.purdue.cs.cs180.channel.*;
-
 public class Server implements MessageListener {
     /**
      * Creates a server channel on the current machine and assigns port 8888 to it.
